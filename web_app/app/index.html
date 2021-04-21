@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>High Energy Physics paper tagger</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+  </head>
+  <body ng-app="HepThApp" style="background-color:#EBEBEB">
+    <style>
+      @media (max-width: 800px) {
+      	img {
+          max-width: 300px;
+      	}
+      }
+    </style>
+    <br>
+    <div style="margin-left:10px;margin-right:10px;text-align:center">
+      <h2>High Energy Physics paper tagger</h2>
+    </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        This website collects the new papers published daily in the <em>hep-th</em> category on the arXiv and assigns a topic (the colourful box below the abstract) to each of them using machine learning techniques. <a href="http://hep-th-classifier.s3-website.eu-west-2.amazonaws.com/about.html">Find out more about this app.</a>
+      </p>
+    <div class="container">
+      <div id="HepThGrid" class="row" ng-controller="HepThListController">
+          <div class="col-sm-12 col-md-12" ng-repeat="paper in papers">
+              <br>
+              <p>
+                <h4>
+                  {{paper.name}}
+                  <a href="{{paper.link}}">
+                    <img src="./img/arxiv_link.png" height="40px" align="right">
+                  </a>
+                </h4>
+                <p>{{paper.authors}}</p>
+                <p>{{paper.abstract}}</p>
+                <img src="http://hep-th-classifier.s3-website.eu-west-2.amazonaws.com/img/{{paper.tag}}.png" height="30px" align="left">
+              </p>
+          </div>
+        </div>
+      </div>
+      <br>
+      <hr>
+      <br>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        This site was created using Flask, and the source code is available on <a href="https://github.com/carlosparaciari/">GitHub.</a>
+      </p>
+  </body>
+  <script>
+
+    var HepThApiEndpoint = 'http://ec2-18-133-241-180.eu-west-2.compute.amazonaws.com';
+
+    var app = angular.module('HepThApp', []);
+
+    var gridScope;
+
+    /*
+      Populate the table with new papers from the arXi
+    */
+    app.controller('HepThListController', function($scope) {
+
+      gridScope = $scope;
+
+      getAllPapers(applyGridScope);
+
+    });
+
+    /*
+      Reload the grid of papers whenever a new list is retrieved
+    */
+    function applyGridScope(paper_list) {
+      gridScope.papers = paper_list;
+      gridScope.$apply();
+    }
+
+    /*
+      Retrieve the full list of papers from the backend service API.
+    */
+    function getAllPapers(callback) {
+
+      var HepThApi = HepThApiEndpoint + '/papers';
+
+      $.ajax({
+        url : HepThApi,
+        type : 'GET',
+        success : function(response) {
+          callback(response.papers);
+        },
+        error : function(response) {
+          console.log("could not retrieve the paper list.");
+          console.log(response.message);
+        }
+      });
+    }
+
+
+  </script>
+</html>

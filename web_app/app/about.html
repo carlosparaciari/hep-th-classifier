@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>High Energy Physics paper tagger</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+  </head>
+  <body ng-app="HepThApp" style="background-color:#EBEBEB">
+    <style>
+      @media (max-width: 800px) {
+      	img {
+          max-width: 300px;
+      	}
+      }
+    </style>
+    <br>
+    <div style="margin-left:10px;margin-right:10px;text-align:center">
+      <h2>About - High Energy Physics paper tagger</h2>
+    </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        This website collects the new papers published daily in the <em>hep-th</em> category on the arXiv and assigns a topic (the colourful box below the abstract) to each of them using machine learning techniques. <a href="http://hep-th-classifier.s3-website.eu-west-2.amazonaws.com">Go to the main page.</a>
+      </p>
+      <div style="margin-left:10px;margin-right:10px;text-align:center">
+        <h3>1. Details on the machine learning model</h3>
+      </div>
+      <div style="margin-left:10px;margin-right:10px;text-align:justify">
+        <h4>1.1. How does the model work?</h4>
+      </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        The model used in this app classifies the new papers in the <em>hep-th</em> category of the arXiv using their title and abstract. The papers are divided into 8 different categories (different topics in HEP),
+        <ul style="margin-left:10px;margin-right:10px;text-align:justify">
+          <li>AdS-CFT correspondence</li>
+          <li>Black holes</li>
+          <li>Beyond the standard model</li>
+          <li>QCD phenomenology</li>
+          <li>Scatter amplitudes</li>
+          <li>Supergravity models</li>
+          <li>Supersymmetric gauge theories</li>
+          <li>Supersymmetric phenomenology</li>
+        </ul>
+      </p>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        There is a further label, <em>unknown topic</em>, used when the model cannot classify a paper with high confidence. Here, high confidence means that the model estimates that the paper belongs to a given class with probability higher than 50%. There are several reasons why the model might be unsure about the topic of a paper. An important one to consider is that the dataset used to train the model might not contain papers on a given topic that appears in the <em>hep-th</em> arXiv category. Furthermore, some of the papers appearing in this category are cross-listed (i.e., they do appear on multiple categories) and might not fully fall within the field of High Energy Physics.
+      </p>
+      <div style="margin-left:10px;margin-right:10px;text-align:justify">
+        <h4>1.2. How are the papers classified?</h4>
+      </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+      The classification of the papers is achieved in three main steps,
+      <ul style="margin-left:10px;margin-right:10px;text-align:justify">
+        <li>Firstly, the abstract and title are cleaned using standard Natural Language Processing techniques (we remove LaTex equations, punctuation, stopwords, and we lemmatize the words).</li>
+        <li>Secondly, we use a word2vec embedding to map each word into a real vector space. We trained the word2vec embedding using the abstracts and titles of the papers (contained in the <em>hep-th</em> category) found in the <a href="https://www.kaggle.com/Cornell-University/arxiv">arXiv dataset on Kaggle</a>.</li>
+        <li>Finally, we use a Convolutional Neural Network to classify the papers. <a href="https://github.com/carlosparaciari/abstract-classification-embedding">More details are available here.</a></li>
+      </ul>
+      </p>
+      <div style="margin-left:10px;margin-right:10px;text-align:justify">
+        <h4>1.3. How was the model selected?</h4>
+      </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+      Before settling with the above architecture, we have trained multiple models, with different pre-processing of the data, and we have selected the one with an accuracy significantly higher than the others (where we used McNemar's test for assessing the significance of an accuracy improvement). Specifically,
+      <ul style="margin-left:10px;margin-right:10px;text-align:justify">
+        <li><a href="https://github.com/carlosparaciari/abstract-classification-supervised">In this work</a>, we pre-processed the data using TF-IDF vectorization and used different models to classify the papers. The models we used include Random Forest, Gradient Boosting, Support Vector Machine with linear Kernel, Logistic Regression.</li>
+        <li><a href="https://github.com/carlosparaciari/abstract-classification-embedding">In this work</a>, we pre-processed the data using word2vec embedding and used two Neural Network architectures to classify the papers; a Convolutional Neural Network, and a Recursive Neural Network.</li>
+      </ul>
+      </p>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+      In addition to the above studies, we use unsupervised methods to cluster papers (published on the arXiv in the <em>hep-th</em> category) into different groups and gain a better understanding of which topics are generally covered in this category. <a href="https://github.com/carlosparaciari/abstract-clustering">The study can be found here.</a> Our results seem to indicate a good overlap between the labels we use to classify the papers and the topics published on the arXiv, as discovered using unsupervised techniques. For this study, we have used K-Means Clustering, Hierarchical Clustering, and Spectral Clustering.
+      </p>
+      <div style="margin-left:10px;margin-right:10px;text-align:justify">
+        <h4>1.4. What dataset was used to train the model?</h4>
+      </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        The dataset used for training the model was obtained from the <a href="https://dev.springernature.com/">Springer Nature Metadata</a>, which provides access to the metadata for 13 million online documents. The metadata belongs to the papers published in the open-access <em>Journal of High Energy Physics</em>.
+        <br>
+        We use the most popular keywords, assigned by the authors when submitting the papers, as labels for the training set. <a href="https://github.com/carlosparaciari/abstract-classification-supervised">More details are available here.</a>
+      </p>
+      <div style="margin-left:10px;margin-right:10px;text-align:center">
+        <h3>2. Where is the website hosted?</h3>
+      </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        As you can probably tell from the URL of this page, the website is hosted on AWS. The main components of the app are,
+        <ul style="margin-left:10px;margin-right:10px;text-align:justify">
+          <li>A public S3 bucket where the static part of the website (the HTML and PNG files) is stored.</li>
+          <li>An EC2 instance where the dynamic part of the website is running. When a request is sent to the instance, a small script check for the papers stored in a private database, and return the results in JSON format.</li>
+          <li>A private MySQL database (created with RDS) where the metadata of the daily papers from the <em>hep-th</em> category of the arXiv are stored.</li>
+          <li>A Lambda function checking the arXiv RSS feed daily and storing the metadata of the new papers in the private database.</li>
+          <li>A Lambda function running the trained machine learning model on the metadata of the new papers. The model classifies each paper based on the title and abstract, assigning a topic within the field of HEP.</li>
+          <li>A private S3 bucket where the trained model is stored.</li>
+        </ul>
+      </p>
+      <div style="margin-left:10px;margin-right:10px;text-align:center">
+        <h3>3. Who made this website?</h3>
+      </div>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        I am a research scientist working in the field of Quantum Information Theory, a subject at the intersection between Physics, Applied Mathematics, and Computer Science. Writing code is part of my job, and it is a hobby as well. Other small projects I worked on during the years include a Telegram Bot to search on the arXiv, <a href="https://t.me/search_arxiv_bot">available here</a>, and an online dashboard showing COVID-19 cases in the different boroughs of London (where I live) and provinces of Italy (where I am originally from), <a href="https://covid-19-london.herokuapp.com/plots">available here</a>. Find more about my projects on my <a href="https://github.com/carlosparaciari">GitHub account</a>.
+      </p>
+      <br>
+      <hr>
+      <br>
+      <p style="margin-left:10px;margin-right:10px;text-align:justify">
+        This site was created using Flask, and the source code is available on <a href="https://github.com/carlosparaciari/">GitHub.</a>
+      </p>
+  </body>
+</html>
