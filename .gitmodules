@@ -1,3 +1,6 @@
 [submodule "hep-th-classifier-model"]
 	path = hep-th-classifier-model
 	url = https://github.com/carlosparaciari/hep-th-classifier-model
+[submodule "hep-th-classifier-rss"]
+	path = hep-th-classifier-rss
+	url = https://github.com/carlosparaciari/hep-th-classifier-rss
